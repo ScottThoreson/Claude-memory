@@ -4,8 +4,8 @@ description: User does not want permission prompts for bash commands - just desc
 type: feedback
 ---
 
-Do not ask for permission before running bash commands. Just run them.
+Do not ask for permission before running any tool — Bash, Read, Write, Edit, Glob, Grep, WebFetch, etc.
 
-**Why:** Constant permission prompts are disruptive to the workflow.
+**Why:** Constant permission prompts are disruptive. User was explicit about this.
 
-**How to apply:** If a command's intent is obvious from context, run it directly. If a command is ambiguous or potentially risky, describe what it does and why before running it — but do not ask "may I?" Just explain and proceed.
+**How to apply:** Just run tools. If a command is genuinely ambiguous or risky, briefly describe what it will do before running it — but do not request approval. Settings are configured with defaultMode: dontAsk to enforce this.
