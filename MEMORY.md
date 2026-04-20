@@ -30,3 +30,6 @@ C:\Users\12146\.claude-tokens.env (NOT in GitHub)
 - [Laptop setup](project_laptop_setup.md)
 - [Bash permissions](feedback_bash_permissions.md)
 - [C# edits](feedback_cs_edits.md)
+
+## DnD Project Notes
+- [Blazor/SignalR is legacy](project_blazor_is_legacy.md) — real build targets Next.js + Firebase per PROJECT_KNOWLEDGE.MD
