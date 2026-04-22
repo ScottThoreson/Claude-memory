@@ -37,6 +37,7 @@ C:\Users\12146\.claude-tokens.env (NOT in GitHub)
 - [MVP scope (post-pivot)](project_dnd_mvp_scope.md) — **CURRENT** — Foundry-direct players, DM page, TV banner, Claude Project; combat UI + ElevenLabs + voice ID deferred
 - [Firebase coordinates](reference_dnd_firebase.md) — project ID, RTDB URL, repo, local paths (Firebase less central post-pivot but still used)
 - [ScriptWright](reference_scriptwright.md) — safety-first LLM macro generator for Foundry; key tool for content-build phase
+- [Prior campaign](project_dnd_prior_campaign.md) — family ran Dragons of Stormwreck Isle previously; candidate for continuity in first "real" campaign
 - [Blazor/SignalR is legacy](project_blazor_is_legacy.md) — old prototype at `source/repos/DnD`; abandoned
 - [Wizard-of-Oz testing](project_dnd_wizard_of_oz_testing.md) — historical, superseded by Claude.ai Project pattern but concepts still relevant
 - [Auth + persistence design](project_dnd_auth_and_persistence.md) — historical, less critical post-pivot since Foundry handles player identity
