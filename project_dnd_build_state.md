@@ -1,65 +1,50 @@
 ---
-name: DnD build state (2026-04-21 EOD)
-description: Comprehensive snapshot of the DnD digital table build at end of the 2026-04-21 session
+name: DnD build state (2026-04-23 EOD)
+description: End-of-session snapshot — what's built, what's tested, what's next
 type: project
 originSessionId: a78ba36d-e093-4142-9f67-a84a32bcf57c
 ---
-**Session of 2026-04-21 was huge.** Design locked in, most infrastructure built, first tests green. User went to bed after "sync all".
+## Current state (end of 2026-04-23 session)
 
-## Current state
+**Canonical repo:** `thoresonws-pixel/DnD@master`. Relevant commits since the 2026-04-21 snapshot:
+- `3f361cf` — skills cleanup (deleted 8 obsolete specs, rewrote 4 for hybrid)
+- `ec4ff81` — added Brena/Pell/Garrin + Owlbear/Spider/Skeleton to `prep/delian-tomb-npcs.md`
+- `8ccb587` — `scripts/create-npcs.mjs` (batch-create NPCs via REST API)
+- `59e58c4` — `prep/macros/` (6 scene macros: narrate, combat-start, arrow-trap, boss-skarvax-phase2, secret-door-reveal, scene-transition-fade)
 
-**Canonical repo:** `thoresonws-pixel/DnD@master` — commit `b674c90` has all the code. PROJECT_KNOWLEDGE.MD @ commit `6966724` (reflects the big pivot + hardware plan + voice ID v2).
+**Local Next.js repo at `c:\Users\sthoreson\source\repos\DnD-next`:** clean, no uncommitted changes.
 
-**Local checkout on work machine (sthoreson user):** `c:\Users\sthoreson\source\repos\DnD-next`
+**Foundry world "Delian Tomb Test":**
+- Actors created via REST API: Thorin (player character, updated yesterday), plus 12 new NPCs/monsters — Elder Marta, Barkeep Dain, Brena, Old Pell, Merchant Hollis, Garrin, Skarvax, Elric, Owlbear, Giant Spider, Skeleton, Goblin. Each has biography tags (`[personality]`, `[knowledge-open/guarded/secret]`) ready for Claude to parse.
+- Scenes created via REST API (bare, no background): "Hollowmere Village", "Forest Path", "Delian Tomb Interior".
+- **Hollowmere Village** has 2 Minute Tabletop's Coastal Town night map loaded. No walls yet. No tokens placed yet.
+- Foundry modules active: Tidy 5e Sheets, Foundry REST API, Theatre Inserts, Dice So Nice!, Mobile Improvements, Custom CSS (broken on v14, disabled), libWrapper, PocketScroll Foundry Companion, TouchVTT, Monk's Active Tile Triggers, Sequencer, JB2A Free. Plus custom `dnd-table-skin`.
+- `narrate` macro installed, drag to hotbar working; narration banner fires on TV ✓ end-to-end validated.
 
-**Foundry VTT v14.360** running locally with world "Delian Tomb Test". D&D 5e 5.3.1 system. Running at `http://localhost:30000` and LAN-reachable at `http://192.168.1.167:30000`.
+**DM page** at `http://localhost:3000/session/demo/dm` browser-tested. All panels work. Active NPC dropdown populates from Foundry actors. Voice input / mic / transcription works (pending real playtest).
 
-**Foundry project on foundryrestapi.com relay** paired, 5000 calls/mo free tier. Client ID `fvtt_0b877c160c8b8a36`. REST API + key lives in `.env.local`; same values are referenced in `claude-project-instructions.md` for the Claude.ai Project setup.
+## Notable decisions today
 
-**Firebase project `dnd-thoresonws`** still live but less central now (Foundry is source of truth for game state).
+- **Rejected Baileywiki direct subscription** — their new store is primarily DungeonDraft asset packs + AI credits, not pre-built Foundry scenes. Not the right tool for "I just want a map and some houses."
+- **Rejected Draw Steel switch** — the free Delian Tomb module on Foundry is for MCDM's Draw Steel system, not D&D 5e. Different rules, would require rebuilding Thorin + learning a new system. Family already knows 5e; staying.
+- **Still undecided on Delian Tomb's final village map** — Coastal Town works as placeholder. May hunt 2MT or Dyson for something smaller, may stick with what's there.
 
-## The big pivot (2026-04-21)
+## What's next (open for tomorrow)
 
-**Scott is DM; Claude assists.** Original PROJECT_KNOWLEDGE.MD said "Claude is DM, Scott plays player-blind" — that changed mid-session. See commit `f06aa04` on master. Architecture now:
-- **Foundry** = engine for all game state (actors, combat, dice, rolls, HP, scenes, maps)
-- **Our Next.js DM page** = Scott's companion tool, runs in browser on his laptop alongside Foundry GM view
-- **Our `dnd-table-skin` Foundry module** = UI skin for TV Display + player phones
-- **Claude.ai Project** (Pro subscription) = NPC voice + descriptions + rules lookups. Claude has Foundry REST API credentials in its Project instructions, uses Python code-execution to POST responses directly to Foundry chat. No paste-back required.
+1. **Build out the Tomb Interior scene** — needs a map (Dyson Logos free dungeons are the path), walls, lighting, token placement. This is the only scene that actually needs the heavy wall-drawing work.
+2. **Drop NPC tokens** onto Hollowmere Village scene so the social scene feels populated (~10 min).
+3. **Install remaining macros** as needed — probably `combat-start-banner` next, defer the others until their specific scenes exist.
+4. **Forest Path scene** — either AI-generate an atmospheric image or grab from r/battlemaps.
+5. **Claude.ai Pro Project setup** — user still hasn't created the Project; `claude-project-instructions.md` in the repo is the starting template. Needed before any real NPC dialogue can run through Claude.
 
-## What got built today
+## Known things deferred per MVP scope
 
-- **`dnd-table-skin` Foundry module** at `foundry-modules/dnd-table-skin/` in the repo (+ installed at `C:\Users\sthoreson\AppData\Local\FoundryVTT\Data\modules\dnd-table-skin`)
-  - Strips Foundry UI by role: Player role gets clean sheet-focused view; TV Display user gets scene-only fullscreen
-  - **Narration banner** on TV: typewriter animation, 15s auto-dismiss, triggered by `!narrate <text>` chat prefix or speaker alias "Narrator". **Works** — tested via REST API → banner fires on TV ✅
-  - **Combat mode**: top banner "YOUR TURN" (pulsing gold) driven by Foundry `combatStart`/`updateCombat` hooks
-  - **Leader arrow pad**: injected when `tactical + leader` flags set via `!tactical on` / `!leader <id>` GM chat commands
-  - **Player ACTION button**: slide-up dialog on phones without a controller
-  - **Auto-open character sheet** for Player-role users on mobile
-- **Next.js DM companion page** at `/session/[id]/dm` — full layout with active speaker, active NPC, voice input (Web Speech API + Gamepad API Start button), player feed, narration direct, roll entry, copy-context-to-Claude prompt builder. **Compiles 200, needs real browser testing.**
-- **API proxies** for Foundry REST API: `/api/foundry/chat` (GET list, POST send), `/api/foundry/actors` (list), `/api/foundry/actors/[uuid]` (specific).
-- **Claude Project instructions** drafted at `claude-project-instructions.md` in the repo — ready for Scott to paste into a Claude.ai Pro Project.
-- **Foundry content**: Thorin actor exists (level 3 Dwarf Fighter, stat block via REST API update; items need to be drag-added from compendium). TV Display user exists.
-- **Foundry modules enabled in world:** Tidy 5e Sheets, Foundry REST API, Theatre Inserts, Dice So Nice!, Mobile Improvements, Custom CSS (broken on v14 — left disabled), libWrapper, PocketScroll Foundry Companion (installed but user rejected paid sub), TouchVTT.
+- JRPG combat UI on TV — after loop proven
+- ElevenLabs voice — after UX stable
+- Joy-Con input — after core working
+- Voice ID v2 — manual speaker dropdown suffices
+- Claude API direct integration — Wizard-of-Oz via Claude.ai only for now
 
-## Hardware plan (locked)
+**Why:** All decisions + state captured so next session can resume without re-deriving.
 
-- **Scott's laptop** = central hub. Runs Foundry GM + DM page + Bluetooth controllers + USB Razer mic.
-- **1-2 full-size controllers** passed around (8BitDo Pro 2 ~$50 recommended, or Xbox ~$60). JRPG-style.
-- **Razer USB mic** at table center — single shared mic, wired (doesn't eat BT slots).
-- **Joy-Cons rejected** for primary input (felt not-epic) but can serve as fallback.
-- **Family Switches exist** — used for Joy-Cons if we revisit, also their TVs are candidates.
-- **Phones optional** — anyone who wants character sheet handy opens Foundry URL in Chrome.
-
-## Not built / open items
-
-- **JRPG combat TV UI** (scoped, ~2 days of work — reads Foundry combat state, renders menu, forwards controller input)
-- **ElevenLabs voice integration** for NPC speech synthesis
-- **Joy-Con / full gamepad polling** for Action/menu navigation on player phones
-- **Voice ID v2** (browser-side speaker embedding) — planned as follow-up feature
-- **NPCs in Foundry** — only Thorin as player character exists. Need Barkeep + other test NPCs with biography `[personality]` / `[knowledge-*]` tags
-- **Scenes/maps** — using default Foundry splash; need a real Delian Tomb scene
-- **Real end-to-end playtest** — hasn't happened yet. DM page not exercised in browser.
-
-**Why:** End-of-session snapshot so future-me doesn't have to re-derive state from scratch.
-
-**How to apply:** At start of next session, verify `npm run dev` still starts clean in `DnD-next`, Foundry is still reachable + REST API paired, and the big outstanding item to drive toward is a real self-playtest of the DM page + skin module + Claude Project together.
+**How to apply:** At next session start, check that dev server still runs, Foundry is reachable, REST API pairing is still valid (commonly needs quick re-pair after relaunch). The biggest outstanding artifact is the Tomb Interior scene — focus there first if we want an end-to-end playtest.
